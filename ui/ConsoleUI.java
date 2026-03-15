@@ -4,6 +4,7 @@ import controller.ElevatorController;
 import model.Elevator;
 import model.Request;
 import state.EmergencyState;
+import state.MaintenanceState;
 
 import java.util.Scanner;
 
@@ -25,6 +26,7 @@ public class ConsoleUI {
             System.out.println("4. Trigger Emergency");
             System.out.println("5. Run Elevator");
             System.out.println("6. Exit");
+            System.out.println("7. Enable Maintenance Mode");
 
             int choice = scanner.nextInt();
 
@@ -65,6 +67,11 @@ public class ConsoleUI {
                 case 6:
                     System.out.println("System shutting down.");
                     return;
+
+                case 7:
+                elevator.setCurrentState(new MaintenanceState());
+                System.out.println("Maintenance mode activated.");
+                break;    
 
                 default:
                     System.out.println("Invalid option.");
