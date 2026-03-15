@@ -49,6 +49,7 @@ public class MovingDownState implements ElevatorState {
             }
 
             System.out.println("Reached floor " + targetFloor);
+            elevator.setCurrentState(new DoorOpenState());
 
         } else {
             elevator.setCurrentState(new IdleState());
