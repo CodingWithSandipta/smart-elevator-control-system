@@ -77,4 +77,8 @@ public class Elevator {
             normalRequests.add(request);
         }
     }
+
+    public boolean isOverloaded() {
+        return currentWeight > maxWeight;
+    }
 }

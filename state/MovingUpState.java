@@ -14,6 +14,11 @@ public class MovingUpState implements ElevatorState {
     @Override
     public void move(Elevator elevator) {
 
+        if (elevator.isOverloaded()) {
+            System.out.println("Elevator overloaded! Cannot move.");
+            return;
+        }
+
         if (!elevator.getPriorityRequests().isEmpty()) {
 
             Request req = elevator.getPriorityRequests().poll();
@@ -31,6 +36,7 @@ public class MovingUpState implements ElevatorState {
             }
 
             System.out.println("Reached priority floor " + targetFloor);
+            elevator.setCurrentState(new DoorOpenState());
 
         } else if (!elevator.getNormalRequests().isEmpty()) {
 
@@ -50,7 +56,7 @@ public class MovingUpState implements ElevatorState {
 
             System.out.println("Reached floor " + targetFloor);
             elevator.setCurrentState(new DoorOpenState());
-            
+
         } else {
             elevator.setCurrentState(new IdleState());
             System.out.println("No more requests. Elevator idle.");

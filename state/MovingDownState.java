@@ -13,6 +13,11 @@ public class MovingDownState implements ElevatorState {
 
     @Override
     public void move(Elevator elevator) {
+        
+        if (elevator.isOverloaded()) {
+            System.out.println("Elevator overloaded! Cannot move.");
+            return;
+        }
 
         if (!elevator.getPriorityRequests().isEmpty()) {
 
