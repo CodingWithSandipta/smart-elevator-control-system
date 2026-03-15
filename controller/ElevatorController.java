@@ -1,5 +1,6 @@
 package controller;
 
+import exception.InvalidFloorException;
 import model.Elevator;
 import model.Request;
 import state.MovingDownState;
@@ -15,12 +16,23 @@ public class ElevatorController {
 
     public void submitRequest(Request request) {
 
+    try {
+
+        if (request.getFloorNumber() > elevator.getMaxFloor() || request.getFloorNumber() < 1) {
+            throw new InvalidFloorException("Invalid floor requested.");
+        }
+
         System.out.println("New request received for floor " + request.getFloorNumber());
 
         elevator.getCurrentState().handleRequest(elevator, request);
 
         decideDirection();
+
+    } 
+    catch (InvalidFloorException e) {
+        System.out.println(e.getMessage());
     }
+   }
 
     private void decideDirection() {
 

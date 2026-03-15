@@ -2,6 +2,7 @@ package state;
 
 import model.Elevator;
 import model.Request;
+import exception.OverloadException;
 
 public class MovingDownState implements ElevatorState {
 
@@ -13,52 +14,58 @@ public class MovingDownState implements ElevatorState {
 
     @Override
     public void move(Elevator elevator) {
-        
-        if (elevator.isOverloaded()) {
-            System.out.println("Elevator overloaded! Cannot move.");
-            return;
-        }
 
-        if (!elevator.getPriorityRequests().isEmpty()) {
+        try {
 
-            Request req = elevator.getPriorityRequests().poll();
-            int targetFloor = req.getFloorNumber();
-
-            while (elevator.getCurrentFloor() > targetFloor) {
-                elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
-                System.out.println("Moving down... Current floor: " + elevator.getCurrentFloor());
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            if (elevator.isOverloaded()) {
+                throw new OverloadException("Elevator overloaded! Cannot move.");
             }
 
-            System.out.println("Reached priority floor " + targetFloor);
+            if (!elevator.getPriorityRequests().isEmpty()) {
 
-        } else if (!elevator.getNormalRequests().isEmpty()) {
+                Request req = elevator.getPriorityRequests().poll();
+                int targetFloor = req.getFloorNumber();
 
-            Request req = elevator.getNormalRequests().poll();
-            int targetFloor = req.getFloorNumber();
+                while (elevator.getCurrentFloor() > targetFloor) {
+                    elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
+                    System.out.println("Moving down... Current floor: " + elevator.getCurrentFloor());
 
-            while (elevator.getCurrentFloor() > targetFloor) {
-                elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
-                System.out.println("Moving down... Current floor: " + elevator.getCurrentFloor());
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                System.out.println("Reached priority floor " + targetFloor);
+                elevator.setCurrentState(new DoorOpenState());
+
+            } else if (!elevator.getNormalRequests().isEmpty()) {
+
+                Request req = elevator.getNormalRequests().poll();
+                int targetFloor = req.getFloorNumber();
+
+                while (elevator.getCurrentFloor() > targetFloor) {
+                    elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
+                    System.out.println("Moving down... Current floor: " + elevator.getCurrentFloor());
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                System.out.println("Reached floor " + targetFloor);
+                elevator.setCurrentState(new DoorOpenState());
+
+            } else {
+                elevator.setCurrentState(new IdleState());
+                System.out.println("No more requests. Elevator idle.");
             }
 
-            System.out.println("Reached floor " + targetFloor);
-            elevator.setCurrentState(new DoorOpenState());
-
-        } else {
-            elevator.setCurrentState(new IdleState());
-            System.out.println("No more requests. Elevator idle.");
+        } catch (OverloadException e) {
+            System.out.println(e.getMessage());
         }
     }
 
