@@ -3,6 +3,7 @@ package state;
 import model.Elevator;
 import model.Request;
 import exception.OverloadException;
+import state.IdleState;
 
 public class MovingDownState implements ElevatorState {
 
@@ -66,6 +67,8 @@ public class MovingDownState implements ElevatorState {
 
         } catch (OverloadException e) {
             System.out.println(e.getMessage());
+            System.out.println("Please reduce weight and try again.");
+            elevator.setCurrentState(new IdleState());
         }
     }
 

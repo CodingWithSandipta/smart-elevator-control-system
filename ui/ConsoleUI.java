@@ -26,10 +26,11 @@ public class ConsoleUI {
             System.out.println("1. Request Floor");
             System.out.println("2. Request Priority Floor");
             System.out.println("3. Add Passenger Weight");
-            System.out.println("4. Trigger Emergency");
-            System.out.println("5. Run Elevator");
-            System.out.println("6. Exit");
-            System.out.println("7. Enable Maintenance Mode");
+            System.out.println("4. Remove Passenger Weight");
+            System.out.println("5. Trigger Emergency");
+            System.out.println("6. Run Elevator");
+            System.out.println("7. Exit");
+            System.out.println("8. Enable Maintenance Mode");
 
             int choice = scanner.nextInt();
 
@@ -83,11 +84,29 @@ public class ConsoleUI {
                     break;
 
                 case 4:
+                    System.out.print("Enter weight to remove: ");
+                    double removeWeight = scanner.nextDouble();
+
+                    if (removeWeight < 0) {
+                        System.out.println("Weight to remove must be positive.");
+                        break;
+                    }
+
+                    double adjustedWeight = elevator.getCurrentWeight() - removeWeight;
+                    if (adjustedWeight < 0) {
+                        adjustedWeight = 0;
+                    }
+
+                    elevator.setCurrentWeight(adjustedWeight);
+                    System.out.println("Current weight: " + elevator.getCurrentWeight());
+                    break;
+
+                case 5:
                     elevator.setCurrentState(new EmergencyState());
                     System.out.println("Emergency mode activated!");
                     break;
 
-                case 5:
+                case 6:
 
                     if (elevator.getCurrentState().getStateName().equals("Emergency") ||
                         elevator.getCurrentState().getStateName().equals("Maintenance")) {
@@ -100,11 +119,11 @@ public class ConsoleUI {
 
                     break;
 
-                case 6:
+                case 7:
                     System.out.println("System shutting down.");
                     return;
 
-                case 7:
+                case 8:
                     elevator.setCurrentState(new MaintenanceState());
                     System.out.println("Maintenance mode activated.");
                     break;
