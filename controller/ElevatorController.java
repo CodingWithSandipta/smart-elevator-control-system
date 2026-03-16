@@ -16,25 +16,31 @@ public class ElevatorController {
 
     public void submitRequest(Request request) {
 
-    try {
+        try {
 
-        if (request.getFloorNumber() > elevator.getMaxFloor() || request.getFloorNumber() < 1) {
-            throw new InvalidFloorException("Invalid floor requested.");
+            if (request.getFloorNumber() > elevator.getMaxFloor() || request.getFloorNumber() < 1) {
+                throw new InvalidFloorException("Invalid floor requested.");
+            }
+
+            System.out.println("New request received for floor " + request.getFloorNumber());
+
+            elevator.getCurrentState().handleRequest(elevator, request);
+
+            decideDirection();
+
+        } catch (InvalidFloorException e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("New request received for floor " + request.getFloorNumber());
-
-        elevator.getCurrentState().handleRequest(elevator, request);
-
-        decideDirection();
-
-    } 
-    catch (InvalidFloorException e) {
-        System.out.println(e.getMessage());
     }
-   }
 
     private void decideDirection() {
+
+        String state = elevator.getCurrentState().getStateName();
+
+        // Do not override Emergency or Maintenance modes
+        if (state.equals("Emergency") || state.equals("Maintenance")) {
+            return;
+        }
 
         if (!elevator.getPriorityRequests().isEmpty()) {
 
@@ -46,8 +52,7 @@ public class ElevatorController {
                 elevator.setCurrentState(new MovingDownState());
             }
 
-        } 
-        else if (!elevator.getNormalRequests().isEmpty()) {
+        } else if (!elevator.getNormalRequests().isEmpty()) {
 
             int target = elevator.getNormalRequests().peek().getFloorNumber();
 
@@ -56,11 +61,13 @@ public class ElevatorController {
             } else {
                 elevator.setCurrentState(new MovingDownState());
             }
-
         }
     }
 
     public void runElevator() {
-        elevator.getCurrentState().move(elevator);
+
+        while (!elevator.getCurrentState().getStateName().equals("Idle")) {
+            elevator.getCurrentState().move(elevator);
+        }
     }
 }

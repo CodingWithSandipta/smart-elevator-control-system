@@ -20,6 +20,9 @@ public class ConsoleUI {
         while (true) {
 
             System.out.println("\n--- Smart Elevator System ---");
+            System.out.println("Current Floor: " + elevator.getCurrentFloor());
+            System.out.println("Current State: " + elevator.getCurrentState().getStateName());
+
             System.out.println("1. Request Floor");
             System.out.println("2. Request Priority Floor");
             System.out.println("3. Add Passenger Weight");
@@ -33,24 +36,48 @@ public class ConsoleUI {
             switch (choice) {
 
                 case 1:
-                    System.out.print("Enter floor number: ");
-                    int floor = scanner.nextInt();
-                    controller.submitRequest(new Request(floor, false));
+                    try {
+                        System.out.print("Enter floor number: ");
+                        int floor = scanner.nextInt();
+
+                        if (floor < 1 || floor > elevator.getMaxFloor()) {
+                            throw new RuntimeException("Invalid floor selected!");
+                        }
+
+                        controller.submitRequest(new Request(floor, false));
+
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
 
                 case 2:
-                    System.out.print("Enter priority floor: ");
-                    int pFloor = scanner.nextInt();
-                    controller.submitRequest(new Request(pFloor, true));
+                    try {
+                        System.out.print("Enter priority floor: ");
+                        int pFloor = scanner.nextInt();
+
+                        if (pFloor < 1 || pFloor > elevator.getMaxFloor()) {
+                            throw new RuntimeException("Invalid floor selected!");
+                        }
+
+                        controller.submitRequest(new Request(pFloor, true));
+
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
 
                 case 3:
                     System.out.print("Enter passenger weight: ");
                     double weight = scanner.nextDouble();
 
-                    elevator.setCurrentWeight(
-                        elevator.getCurrentWeight() + weight
-                    );
+                    double newWeight = elevator.getCurrentWeight() + weight;
+
+                    if (newWeight > elevator.getMaxWeight()) {
+                        System.out.println("Warning: Elevator overloaded!");
+                    }
+
+                    elevator.setCurrentWeight(newWeight);
 
                     System.out.println("Current weight: " + elevator.getCurrentWeight());
                     break;
@@ -61,7 +88,16 @@ public class ConsoleUI {
                     break;
 
                 case 5:
-                    controller.runElevator();
+
+                    if (elevator.getCurrentState().getStateName().equals("Emergency") ||
+                        elevator.getCurrentState().getStateName().equals("Maintenance")) {
+
+                        System.out.println("Elevator cannot run in current mode.");
+
+                    } else {
+                        controller.runElevator();
+                    }
+
                     break;
 
                 case 6:
@@ -69,9 +105,9 @@ public class ConsoleUI {
                     return;
 
                 case 7:
-                elevator.setCurrentState(new MaintenanceState());
-                System.out.println("Maintenance mode activated.");
-                break;    
+                    elevator.setCurrentState(new MaintenanceState());
+                    System.out.println("Maintenance mode activated.");
+                    break;
 
                 default:
                     System.out.println("Invalid option.");
