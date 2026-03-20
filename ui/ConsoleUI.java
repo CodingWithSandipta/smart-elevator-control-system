@@ -22,6 +22,7 @@ public class ConsoleUI {
             System.out.println("\n--- Smart Elevator System ---");
             System.out.println("Current Floor: " + elevator.getCurrentFloor());
             System.out.println("Current State: " + elevator.getCurrentState().getStateName());
+            System.out.println("Current Weight: " + elevator.getCurrentWeight());
 
             System.out.println("1. Request Floor");
             System.out.println("2. Request Priority Floor");
@@ -79,7 +80,6 @@ public class ConsoleUI {
                     }
 
                     elevator.setCurrentWeight(newWeight);
-
                     System.out.println("Current weight: " + elevator.getCurrentWeight());
                     break;
 
@@ -93,6 +93,7 @@ public class ConsoleUI {
                     }
 
                     double adjustedWeight = elevator.getCurrentWeight() - removeWeight;
+
                     if (adjustedWeight < 0) {
                         adjustedWeight = 0;
                     }
@@ -107,6 +108,11 @@ public class ConsoleUI {
                     break;
 
                 case 6:
+
+                    if (elevator.isOverloaded()) {
+                        System.out.println("Elevator overloaded! Please remove weight before running.");
+                        break;
+                    }
 
                     if (elevator.getCurrentState().getStateName().equals("Emergency") ||
                         elevator.getCurrentState().getStateName().equals("Maintenance")) {
